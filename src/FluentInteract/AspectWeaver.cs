@@ -101,9 +101,7 @@ namespace FluentInteract
             _aspects.Add(Activator.CreateInstance<T>());
         }
 
-        public IChangingExecuteAspect GetChangingExecuteAspect<TInput, TOutput>(IInteractor<TInput, TOutput> interactor, TInput input)
-            where TInput : IInput
-            where TOutput : IOutput
+        public IChangingExecuteAspect GetChangingExecuteAspect(IInteractor interactor, object input)
         {
             foreach (var changingExecuteAspect in ChangingExecuteAspects)
             {
@@ -114,9 +112,7 @@ namespace FluentInteract
             return null;
         }
 
-        public IAuthorizingAspect GetAuthorizingAspect<TInput, TOutput>(IInteractor<TInput, TOutput> interactor, TInput input)
-            where TInput : IInput
-            where TOutput : IOutput
+        public IAuthorizingAspect GetAuthorizingAspect(IInteractor interactor, object input)
         {
             foreach (var authorizingAspect in AuthorizingAspects)
             {

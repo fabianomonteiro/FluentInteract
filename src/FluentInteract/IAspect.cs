@@ -2,6 +2,6 @@
 {
     public interface IAspect
     {
-        bool IsMatch(IInteractor interactor, IInput input);
+        bool IsMatch(IInteractor interactor, object input);
     }
 }

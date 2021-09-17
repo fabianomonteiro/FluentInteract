@@ -6,8 +6,6 @@ namespace FluentInteract
     public interface IInteractor { }
 
     public interface IInteractor<TInput, TOutput> : IInteractor
-        where TInput : IInput
-        where TOutput : IOutput
     {
         IInteractor<TInput, TOutput> Execute<TCallerInstance>(
             TCallerInstance callerInstance,

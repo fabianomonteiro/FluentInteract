@@ -1,6 +1,6 @@
 ﻿namespace FluentInteract
 {
-    public class VoidOutput : IOutput
+    public class VoidOutput
     {
         public static VoidOutput Instance { get; private set; }
 

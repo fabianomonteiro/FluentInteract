@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 namespace FluentInteract
 {
     public abstract class Interactor<TInput, TOutput> : IInteractor<TInput, TOutput>
-        where TInput : IInput
-        where TOutput : IOutput
     {
         private TInput _input;
         private Task<TOutput> _output;

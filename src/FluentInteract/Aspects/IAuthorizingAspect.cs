@@ -2,6 +2,6 @@
 {
     public interface IAuthorizingAspect : IAspect
     {
-        bool Authorize(IInteractor interactor, IInput input);
+        bool Authorize(IInteractor interactor, object input);
     }
 }

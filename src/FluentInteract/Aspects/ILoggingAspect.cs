@@ -7,7 +7,7 @@ namespace FluentInteract.Aspects
     {
         void LogStartExecute(
             IInteractor interactor,
-            IInput input,
+            object input,
             ICallerInstance callerInstance,
             string memberName,
             string sourceFilePath,
