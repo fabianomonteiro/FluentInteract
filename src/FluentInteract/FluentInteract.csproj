@@ -2,6 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>0.0.1</Version>
+    <Authors>Fabiano Monteiro</Authors>
+    <Company>Fabiano Monteiro</Company>
+    <Description>FluentInteract é uma biblioteca que implementa o padrão Interactor descrito por Robert Cecil Martin no livro de Arquitetura Limpa, utilizando também conceitos de AOP ou POA (Programação Orientada a Aspectos).</Description>
+    <Copyright>Copyright © 2021 Fabiano Monteiro. All rights reserved. Released under the terms of the GPL License.</Copyright>
+    <PackageProjectUrl>https://github.com/fabianomonteiro/FluentInteract</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/fabianomonteiro/FluentInteract</RepositoryUrl>
+    <PackageReleaseNotes />
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
 </Project>
