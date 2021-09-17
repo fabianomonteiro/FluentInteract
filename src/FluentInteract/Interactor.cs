@@ -1,0 +1,111 @@
+﻿using FluentInteract.Aspects;
+using FluentInteract.Exceptions;
+using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+
+namespace FluentInteract
+{
+    public abstract class Interactor<TInput, TOutput> : IInteractor<TInput, TOutput>
+        where TInput : IInput
+        where TOutput : IOutput
+    {
+        private TInput _input;
+        private Task<TOutput> _output;
+
+        protected abstract Task<TOutput> ImplementExecute(TInput input);
+
+        public virtual IInteractor<TInput, TOutput> Execute<TCallerInstance>(
+            TCallerInstance callerInstance,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "",
+            [CallerLineNumber] int sourceLineNumber = 0)
+            where TCallerInstance : class, ICallerInstance
+        {
+            if (Authorize())
+                throw new NotAuthorizedException();
+
+            try
+            {
+                AspectWeaver.Instance.LoggingAspect?.LogStartExecute(this, _input, callerInstance, memberName, sourceFilePath, sourceLineNumber);
+
+                var stopwatch = new Stopwatch();
+
+                stopwatch.Start();
+
+                IChangingExecuteAspect changingExecuteAspect;
+
+                _output = InternalImplementExecute(out changingExecuteAspect);
+
+                stopwatch.Stop();
+
+                AspectWeaver.Instance.LoggingAspect?.LogEndExecute(this, stopwatch.Elapsed, changingExecuteAspect != null, changingExecuteAspect);
+            }
+            catch (Exception ex)
+            {
+                AspectWeaver.Instance.LoggingAspect?.LogExceptionExecute(this, ex);
+
+                throw ex;
+            }
+
+            return this;
+        }
+
+        private bool Authorize()
+        {
+            if (AspectWeaver.Instance.IsAuthorizingAspect)
+            {
+                var authorizingAspect = AspectWeaver.Instance.GetAuthorizingAspect(this, _input);
+
+                if (authorizingAspect != null)
+                    return authorizingAspect.Authorize(this, _input);
+            }
+
+            return true;
+        }
+
+        private Task<TOutput> InternalImplementExecute(out IChangingExecuteAspect changeExecuteAspect)
+        {
+            if (AspectWeaver.Instance.IsChangingExecuteAspect)
+            {
+                changeExecuteAspect = AspectWeaver.Instance.GetChangingExecuteAspect(this, _input);
+
+                return changeExecuteAspect.Execute(this, _input) as Task<TOutput>;
+            }
+
+            changeExecuteAspect = null;
+
+            return ImplementExecute(_input);
+        }
+
+        public IInteractor<TInput, TOutput> SetInput(TInput input)
+        {
+            _input = input;
+
+            return this;
+        }
+
+        public async Task<TOutput> GetOutputAsync()
+        {
+            return await _output;
+        }
+
+        public TOutput GetOutput()
+        {
+            return _output.Result;
+        }
+
+        public IInteractor<TInput, TOutput> MapInput<TSource>(TSource source)
+        {
+            _input = AspectWeaver.Instance.MappingAspect.Map<TSource, TInput>(source).Result;
+
+            return this;
+        }
+
+        public async Task<TDestination> GetOutputAsync<TDestination>()
+        {
+            return await AspectWeaver.Instance.MappingAspect.Map<TOutput, TDestination>(_output.Result);
+        }
+    }
+}
