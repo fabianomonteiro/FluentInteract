@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.0.3</Version>
+    <Version>0.0.4</Version>
     <Authors>Fabiano Monteiro</Authors>
     <Company>Fabiano Monteiro</Company>
     <Description>FluentInteract é uma biblioteca que implementa o padrão Interactor descrito por Robert Cecil Martin no livro de Arquitetura Limpa, utilizando também conceitos de AOP ou POA (Programação Orientada a Aspectos).</Description>
@@ -11,8 +11,8 @@
     <RepositoryUrl>https://github.com/fabianomonteiro/FluentInteract</RepositoryUrl>
     <PackageReleaseNotes />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyVersion>0.0.3.0</AssemblyVersion>
-    <FileVersion>0.0.3.0</FileVersion>
+    <AssemblyVersion>0.0.4.0</AssemblyVersion>
+    <FileVersion>0.0.4.0</FileVersion>
   </PropertyGroup>
 
 </Project>

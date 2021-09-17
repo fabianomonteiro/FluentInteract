@@ -69,7 +69,8 @@ namespace FluentInteract
             {
                 changeExecuteAspect = AspectWeaver.Instance.GetChangingExecuteAspect(this, _input);
 
-                return changeExecuteAspect.Execute(this, _input) as Task<TOutput>;
+                if (changeExecuteAspect != null)
+                    return changeExecuteAspect.Execute(this, _input) as Task<TOutput>;
             }
 
             changeExecuteAspect = null;
