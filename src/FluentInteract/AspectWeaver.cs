@@ -95,9 +95,6 @@ namespace FluentInteract
 
         public void AddAspect<T>() where T : class, IAspect
         {
-            if (_aspects.Any(x => x is T))
-                throw new AspectAlreadyAddedException();
-
             _aspects.Add(Activator.CreateInstance<T>());
         }
 

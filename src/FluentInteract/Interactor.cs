@@ -21,7 +21,7 @@ namespace FluentInteract
             [CallerLineNumber] int sourceLineNumber = 0)
             where TCallerInstance : class, ICallerInstance
         {
-            if (Authorize())
+            if (!Authorize())
                 throw new NotAuthorizedException();
 
             try
