@@ -1,5 +1,4 @@
-﻿using System.Net.NetworkInformation;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace FluentInteract.Aspects
 {

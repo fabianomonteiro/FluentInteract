@@ -1,96 +1,22 @@
 ﻿using FluentInteract.Aspects;
-using FluentInteract.Exceptions;
+using FluentInteract.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace FluentInteract
 {
     public class AspectWeaver : IAspectWeaver
     {
-        public static AspectWeaver Instance { get; private set; }
+        public static IAspectWeaver Singleton { get; set; }
 
         private List<IAspect> _aspects = new List<IAspect>();
         public IReadOnlyList<IAspect> Aspects => _aspects;
 
-        private IMappingAspect _mappingAspect;
-        public IMappingAspect MappingAspect
+        public AspectWeaver(params IAspect[] aspects)
         {
-            get
-            {
-                if (_mappingAspect == null)
-                    _mappingAspect = Aspects.FirstOrDefault(x => x is IMappingAspect) as IMappingAspect;
-
-                if (_mappingAspect == null)
-                    throw new NotImplementedMappingAspectException();
-
-                return _mappingAspect;
-            }
-        }
-
-        private ILoggingAspect _loggingAspect;
-        public ILoggingAspect LoggingAspect
-        {
-            get
-            {
-                if (_loggingAspect == null)
-                    _loggingAspect = Aspects.FirstOrDefault(x => x is ILoggingAspect) as ILoggingAspect;
-
-                return _loggingAspect;
-            }
-        }
-
-        private bool? _isChangingExecuteAspect;
-        public bool IsChangingExecuteAspect
-        {
-            get
-            {
-                if (!_isChangingExecuteAspect.HasValue)
-                    _isChangingExecuteAspect = ChangingExecuteAspects.Count() > 0;
-
-                return _isChangingExecuteAspect.Value;
-            }
-        }
-
-        private IEnumerable<IChangingExecuteAspect> _changingExecuteAspects;
-        public IEnumerable<IChangingExecuteAspect> ChangingExecuteAspects
-        {
-            get
-            {
-                if (_changingExecuteAspects == null)
-                    _changingExecuteAspects = Aspects.Where(x => x is IChangingExecuteAspect).OfType<IChangingExecuteAspect>();
-
-                return _changingExecuteAspects;
-            }
-        }
-
-        private bool? _isAuthorizingAspect;
-        public bool IsAuthorizingAspect
-        {
-            get
-            {
-                if (!_isAuthorizingAspect.HasValue)
-                    _isAuthorizingAspect = AuthorizingAspects.Count() > 0;
-
-                return _isAuthorizingAspect.Value;
-            }
-        }
-
-        private IEnumerable<IAuthorizingAspect> _authorizingAspects;
-        public IEnumerable<IAuthorizingAspect> AuthorizingAspects
-        {
-            get
-            {
-                if (_authorizingAspects == null)
-                    _authorizingAspects = Aspects.Where(x => x is IAuthorizingAspect).OfType<IAuthorizingAspect>();
-
-                return _authorizingAspects;
-            }
-        }
-
-        static AspectWeaver()
-        {
-            Instance = new AspectWeaver();
+            _aspects.AddRange(aspects);
         }
 
         public void AddAspect<T>() where T : class, IAspect
@@ -98,26 +24,47 @@ namespace FluentInteract
             _aspects.Add(Activator.CreateInstance<T>());
         }
 
-        public IChangingExecuteAspect GetChangingExecuteAspect(IInteractor interactor, object input)
+        public bool ContainsAspect<TAspect>(IInteractor interactor, object input) where TAspect : IAspect
         {
-            foreach (var changingExecuteAspect in ChangingExecuteAspects)
+            foreach (var aspect in Aspects.Where(x => x is TAspect))
             {
-                if (changingExecuteAspect.IsMatch(interactor, input))
-                    return changingExecuteAspect;
+                if (aspect.IsMatch(interactor, input))
+                    return true;
             }
 
-            return null;
+            return false;
         }
 
-        public IAuthorizingAspect GetAuthorizingAspect(IInteractor interactor, object input)
+        public TAspect GetAspect<TAspect>(IInteractor interactor, object input, bool throwIfNotImplemented = false, Func<Exception> callbackException = null) where TAspect : IAspect
         {
-            foreach (var authorizingAspect in AuthorizingAspects)
+            foreach (var aspect in Aspects.Where(x => x is TAspect))
             {
-                if (authorizingAspect.IsMatch(interactor, input))
-                    return authorizingAspect;
+                if (aspect.IsMatch(interactor, input))
+                    return (TAspect)aspect;
             }
 
-            return null;
+            if (throwIfNotImplemented)
+                throw callbackException.Invoke();
+
+            return default(TAspect);
+        }
+
+        public TAspect GetAspect<TAspect>(IInteractor interactor, object input, out TAspect aspectOut) where TAspect : IAspect
+        {
+            foreach (var aspect in Aspects.Where(x => x is TAspect))
+            {
+                if (aspect.IsMatch(interactor, input))
+                    return aspectOut = (TAspect)aspect;
+            }
+
+            return aspectOut = default(TAspect);
+        }
+
+        public ILogginAspectCollection GetLoggingAspects(IInteractor interactor, object input)
+        {
+            var aspects = Aspects.Where(x => x is ILoggingAspect && x.IsMatch(interactor, input)).OfType<ILoggingAspect>();
+
+            return new LoggingAspectCollection(aspects);
         }
     }
 }

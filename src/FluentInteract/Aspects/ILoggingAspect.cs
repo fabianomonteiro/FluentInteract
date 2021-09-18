@@ -1,26 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using FluentInteract.Interfaces;
 
 namespace FluentInteract.Aspects
 {
-    public interface ILoggingAspect : IAspect
+    public interface ILoggingAspect : ILogging, IAspect
     {
-        void LogStartExecute(
-            IInteractor interactor,
-            object input,
-            ICallerInstance callerInstance,
-            string memberName,
-            string sourceFilePath,
-            int sourceLineNumber);
-
-        void LogEndExecute(
-            IInteractor interactor,
-            TimeSpan timeSpanExecution,
-            bool executeFromAspect,
-            IAspect aspectExecutedInstance);
-
-        void LogExceptionExecute(
-            IInteractor interactor,
-            Exception exception);
+        
     }
 }
