@@ -1,5 +1,9 @@
 # FluentInteract
 
+NuGet:
+
+https://www.nuget.org/packages/FluentInteract/
+
 Registrando Aspectos via injeção de dependência:
 
 ```csharp
